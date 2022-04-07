@@ -7,16 +7,16 @@ AWS.config.update({
 });
 
 const dynamoClient = new AWS.DynamoDB.DocumentClient();
-const TABLE_NAME = 'hpCharacters';
-const getCharacters = async () => {
+const TABLE_NAME = 'Books';
+const getBooks = async () => {
     const params = {
         TableName: TABLE_NAME,
     };
-    const characters = await dynamoClient.scan(params).promise();
-    return characters;
+    const books = await dynamoClient.scan(params).promise();
+    return books;
 };
 
-const getCharacterById = async (id) => {
+const getBookById = async (id) => {
     const params = {
         TableName: TABLE_NAME,
         Key: {
@@ -26,15 +26,15 @@ const getCharacterById = async (id) => {
     return await dynamoClient.get(params).promise();
 };
 
-const addOrUpdateCharacter = async (character) => {
+const addOrUpdateBook = async (book) => {
     const params = {
         TableName: TABLE_NAME,
-        Item: character,
+        Item: book,
     };
     return await dynamoClient.put(params).promise();
 };
 
-const deleteCharacter = async (id) => {
+const deleteBook = async (id) => {
     const params = {
         TableName: TABLE_NAME,
         Key: {
@@ -46,8 +46,8 @@ const deleteCharacter = async (id) => {
 
 module.exports = {
     dynamoClient,
-    getCharacters,
-    getCharacterById,
-    addOrUpdateCharacter,
-    deleteCharacter,
+    getBooks,
+    getBookById,
+    addOrUpdateBook,
+    deleteBook,
 };
