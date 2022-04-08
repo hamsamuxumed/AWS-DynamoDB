@@ -1,10 +1,14 @@
 const express = require('express');
+const cors = require('cors')
 const app = express();
+
+app.use(cors());
+
 const {
     addOrUpdateBook,
     getBooks,
     deleteBook,
-    getBookById,
+    getBookByTitle,
 } = require('./dynamo');
 
 app.use(express.json());
@@ -23,10 +27,10 @@ app.get('/books', async (req, res) => {
     }
 });
 
-app.get('/books/:id', async (req, res) => {
-    const id = req.params.id;
+app.get('/books/:title', async (req, res) => {
+    const title = req.params.title;
     try {
-        const book = await getBookById(id);
+        const book = await getBookByTitle(title);
         console.log(book);
         res.json(book);
     } catch (err) {

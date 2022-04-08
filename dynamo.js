@@ -1,9 +1,9 @@
 const AWS = require('aws-sdk');
 require('dotenv').config();
 
-const AWS_ACCESS_KEY_ID="AKIAWMZ6RNT4BXVP7W7C"
-const AWS_SECRET_ACCESS_KEY="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"
-const AWS_DEFAULT_REGION="us-east-1"
+const AWS_ACCESS_KEY_ID=process.env.AWS_ACCESS_KEY_ID;
+const AWS_SECRET_ACCESS_KEY=process.env.AWS_SECRET_ACCESS_KEY
+const AWS_DEFAULT_REGION=process.env.AWS_DEFAULT_REGION
 AWS.config.update({
     region: AWS_DEFAULT_REGION,
     accessKeyId: AWS_ACCESS_KEY_ID,
@@ -11,7 +11,7 @@ AWS.config.update({
 });
 
 const dynamoClient = new AWS.DynamoDB.DocumentClient();
-const TABLE_NAME = 'Books';
+const TABLE_NAME = 'BookList';
 const getBooks = async () => {
     const params = {
         TableName: TABLE_NAME,
@@ -20,14 +20,15 @@ const getBooks = async () => {
     return books;
 };
 
-const getBookById = async (id) => {
+const getBookByTitle = async (name) => {
     const params = {
         TableName: TABLE_NAME,
-        Key: {
-            id,
+        FilterExpression: 'begins_with(title, :title)',
+        ExpressionAttributeValues: {
+            ':title': `${name}`
         },
     };
-    return await dynamoClient.get(params).promise();
+    return await dynamoClient.scan(params).promise();
 };
 
 const addOrUpdateBook = async (book) => {
@@ -51,7 +52,7 @@ const deleteBook = async (id) => {
 module.exports = {
     dynamoClient,
     getBooks,
-    getBookById,
+    getBookByTitle,
     addOrUpdateBook,
     deleteBook,
 };
