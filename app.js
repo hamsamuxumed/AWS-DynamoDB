@@ -41,8 +41,8 @@ app.post('/login', async (req, res) => {
     try {
         const user = await getUserByEmail(req.body.email)
         const dbPass = user.Items[0].password;
-        const dbName = user.Items[0].fname;
-        const dbEmail = user.Items[0].email;
+        const dbFName = user.Items[0].fname;
+        const dbLName = user.Items[0].lname;
         const enteredPass = req.body.password;
         if(!user){ throw new Error('No user with this email') }
         const authed = await bcrypt.compare(enteredPass, dbPass)
@@ -55,7 +55,7 @@ app.post('/login', async (req, res) => {
                 })
             } 
             const secret = process.env.TOKEN_SECRET;
-            const payload = { name: dbName, email: dbEmail }
+            const payload = { fname: dbFName, lname: dbLName }
             jwt.sign(payload, secret, { expiresIn: '1h' }, sendToken)
         } else {
             throw new Error('User could not be authenticated')  
