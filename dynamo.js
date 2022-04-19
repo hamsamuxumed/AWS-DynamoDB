@@ -12,6 +12,7 @@ AWS.config.update({
 
 const dynamoClient = new AWS.DynamoDB.DocumentClient();
 const TABLE_NAME = 'BookList';
+const USER_TABLE = 'Users';
 const getBooks = async () => {
     const params = {
         TableName: TABLE_NAME,
@@ -31,12 +32,45 @@ const getBookByTitle = async (name) => {
     return await dynamoClient.scan(params).promise();
 };
 
-const addOrUpdateBook = async (book) => {
+const getUserByEmail = async (email) => {
+    const params = {
+        TableName: USER_TABLE,
+        FilterExpression: 'email = :email',
+        ExpressionAttributeValues: {
+            ':email': `${email}`
+        },
+    };
+    return await dynamoClient.scan(params).promise();
+};
+
+const addBook = async (book) => {
     const params = {
         TableName: TABLE_NAME,
         Item: book,
     };
     return await dynamoClient.put(params).promise();
+};
+
+const addUser = async (user) => {
+    const params = {
+        TableName: USER_TABLE,
+        Item: user,
+    };
+    return await dynamoClient.put(params).promise();
+};
+
+const updateBook = async (book,id) => {
+    const params = {
+        TableName: TABLE_NAME,
+        Key: {
+            id: id,
+        },
+        UpdateExpression: 'set reserved = :r',
+        ExpressionAttributeValues: {
+            ':r': book.reserved,
+        },
+    };
+    return await dynamoClient.update(params).promise();
 };
 
 const deleteBook = async (id) => {
@@ -53,6 +87,9 @@ module.exports = {
     dynamoClient,
     getBooks,
     getBookByTitle,
-    addOrUpdateBook,
+    getUserByEmail,
+    addBook,
+    addUser,
+    updateBook,
     deleteBook,
 };

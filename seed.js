@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { addOrUpdateBook } = require('./dynamo');
+const { addBook } = require('./dynamo');
 const api_key = process.env.API_KEY;
 
 const seedData = async () => {
@@ -7,7 +7,7 @@ const seedData = async () => {
     try {
         const { data: books } = await axios.get(url);
         const bookPromises = books.items.map((book, i) => 
-            addOrUpdateBook({ ...book.volumeInfo, id: i + '', reserved: false })
+            addBook({ ...book.volumeInfo, id: i + '', reserved: false })
             );
         await Promise.all(bookPromises);
     } catch (err) {
