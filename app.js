@@ -25,7 +25,8 @@ app.get('/', (req, res) => {
 
 
 app.post('/register', async (req, res) => {
-    const user = req.body;
+    const user = req.body.formData;
+    console.log(user)
     const id = crypto.randomBytes(6).toString("hex");
     try {
         let salt = await bcrypt.genSalt(10);
@@ -39,12 +40,13 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     try {
-        const user = await getUserByEmail(req.body.email)
-        const dbPass = user.Items[0].password;
-        const dbFName = user.Items[0].fname;
-        const dbLName = user.Items[0].lname;
-        const enteredPass = req.body.password;
-        if(!user){ throw new Error('No user with this email') }
+        const user = req.body.formData;
+        const foundUser = await getUserByEmail(user.email)
+        const dbPass = foundUser.Items[0].password;
+        const dbFName = foundUser.Items[0].fname;
+        const dbLName = foundUser.Items[0].lname;
+        const enteredPass = user.password;
+        if(!foundUser){ throw new Error('No user with this email') }
         const authed = await bcrypt.compare(enteredPass, dbPass)
         if (authed){
             const sendToken = (err, token) => {
