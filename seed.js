@@ -7,7 +7,7 @@ const seedData = async () => {
     try {
         const { data: books } = await axios.get(url);
         const bookPromises = books.items.map((book, i) => 
-            addBook({ ...book.volumeInfo, id: i + '', reserved: false })
+            addBook({ ...book.volumeInfo, id: i + '', reserved: false, reserved_by: 'N/A' })
             );
         await Promise.all(bookPromises);
     } catch (err) {

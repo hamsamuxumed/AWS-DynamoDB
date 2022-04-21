@@ -65,9 +65,10 @@ const updateBook = async (book,id) => {
         Key: {
             id: id,
         },
-        UpdateExpression: 'set reserved = :r',
+        UpdateExpression: 'set reserved = :r, reserved_by = :rb',
         ExpressionAttributeValues: {
             ':r': book.reserved,
+            ':rb': book.reserved_by
         },
     };
     return await dynamoClient.update(params).promise();
