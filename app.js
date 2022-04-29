@@ -15,6 +15,8 @@ const {
     getBooks,
     deleteBook,
     getBookByTitle,
+    getBookByReservation,
+    getAllReservations,
     getUserByEmail
 } = require('./dynamo');
 
@@ -27,7 +29,6 @@ app.get('/', (req, res) => {
 
 app.post('/register', async (req, res) => {
     const user = req.body.formData;
-    console.log(user)
     const id = crypto.randomBytes(6).toString("hex");
     try {
         let salt = await bcrypt.genSalt(10);
@@ -43,7 +44,6 @@ app.post('/login', async (req, res) => {
     try {
         const user = req.body.formData;
         const foundUser = await getUserByEmail(user.email)
-        console.log(foundUser.Items[0])
         const dbPass = foundUser.Items[0].password;
         const dbFName = foundUser.Items[0].fname;
         const dbLName = foundUser.Items[0].lname;
@@ -84,8 +84,28 @@ app.get('/books/:title', async (req, res) => {
     const title = req.params.title;
     try {
         const book = await getBookByTitle(title);
-        console.log(book);
         res.json(book);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ err: 'Something went wrong' });
+    }
+});
+
+app.get('/books/reserved/:title', async (req, res) => {
+    const title = req.params.title;
+    try {
+        const book = await getBookByReservation(title);
+        res.json(book);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ err: 'Something went wrong' });
+    }
+});
+
+app.get('/reserved', async (req, res) => {
+    try {
+        const books = await getAllReservations();
+        res.json(books);
     } catch (err) {
         console.error(err);
         res.status(500).json({ err: 'Something went wrong' });

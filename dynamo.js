@@ -32,6 +32,29 @@ const getBookByTitle = async (name) => {
     return await dynamoClient.scan(params).promise();
 };
 
+const getBookByReservation = async (name) => {
+    const params = {
+        TableName: TABLE_NAME,
+        FilterExpression: 'begins_with(reserved_by, :rb)',
+        ExpressionAttributeValues: {
+            ':rb': `${name}`
+        },
+    };
+    return await dynamoClient.scan(params).promise();
+};
+
+const getAllReservations = async () => {
+    console.log('running')
+    const params = {
+        TableName: TABLE_NAME,
+        FilterExpression: 'reserved_by <> :rb',
+        ExpressionAttributeValues: {
+            ':rb': 'N/A'
+        },
+    };
+    return await dynamoClient.scan(params).promise();
+};
+
 const getUserByEmail = async (email) => {
     const params = {
         TableName: USER_TABLE,
@@ -59,16 +82,23 @@ const addUser = async (user) => {
     return await dynamoClient.put(params).promise();
 };
 
+function weekFromNow(){
+    let today = new Date();
+    let nextweek = new Date(today.getFullYear(), today.getMonth(), today.getDate()+7);
+    return nextweek.toLocaleDateString('en-GB');
+}
+
 const updateBook = async (book,id) => {
     const params = {
         TableName: TABLE_NAME,
         Key: {
             id: id,
         },
-        UpdateExpression: 'set reserved = :r, reserved_by = :rb',
+        UpdateExpression: 'set reserved = :r, reserved_by = :rb, due_date = :dd',
         ExpressionAttributeValues: {
             ':r': book.reserved,
-            ':rb': book.reserved_by
+            ':rb': book.reserved_by,
+            ':dd': weekFromNow()
         },
     };
     return await dynamoClient.update(params).promise();
@@ -88,6 +118,8 @@ module.exports = {
     dynamoClient,
     getBooks,
     getBookByTitle,
+    getBookByReservation,
+    getAllReservations,
     getUserByEmail,
     addBook,
     addUser,
